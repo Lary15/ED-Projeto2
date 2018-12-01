@@ -4,7 +4,7 @@
 #include "grafo.h"
 
 
-/*Colocando todos os valores de chaves como INT_MAX e todos os valores de pai como -1*/
+/*Cria um Heap de vertices, colocando todos os valores de chaves como INT_MAX*/
 TipoNo* CriaHeap(int numeroNos, int* Posicao){
     int i;
     TipoNo *Heap;
@@ -16,6 +16,7 @@ TipoNo* CriaHeap(int numeroNos, int* Posicao){
         Heap[i].chave = INT_MAX;
         Heap[i].peso = 0;
         Heap[i].pai = -1;
+        Heap[i].contador_chave = 0;
         Posicao[i] = i;
     }
     return Heap;
@@ -73,6 +74,8 @@ int RetiraMinimo(TipoNo* Heap, int* tamanhoHeap, int* Posicao){
     return Heap[Ultimo].id;
 }
 
+/* Troca o valor chave de um vertice, como isso pode quebrar a propriedade min-heap, 
+verifica-se os nos pais de baixo para cima heapificando o que for necessario*/
 void MudaChave(TipoNo* Heap, int* Posicao, int peso, int idFilho){
     int i, paiHeap;
     TipoNo tmp;

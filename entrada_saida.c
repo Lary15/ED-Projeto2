@@ -53,38 +53,8 @@ void ImprimeGrafo(TipoLista** ListaAdjacencia, int numeroNos){
     }
 }
 
-/*Funcao imprime a MST com arestas ordenadas e calcula seu custo.
-O heap eh um array de nos. O id do no e seu pai formam uma aresta.
-Caso o pai de um no seja igual a -1 essa aresta nao pertence a MST*/ 
-void ImprimeMst(char* nomeArquivo, TipoNo* Heap, int tamanhoHeap, int* custoMst){
-    FILE* ponteiroArquivo;
-    int idFilho, idPai, k=0;
-
-    ponteiroArquivo = fopen(nomeArquivo, "w");
-
-    /*O primeiro loop procura pelos ids de nos em ordem crescente e o segundo percorre o heap
-    em busca de arestas com esse id tambem em ordem crescente*/
-    for(idFilho=0; idFilho < tamanhoHeap; idFilho++){
-        for(idPai=idFilho+1; idPai < tamanhoHeap; idPai++){
-            for(k=0; k < tamanhoHeap; k++){
-                if(Heap[k].pai != -1){ 
-                    if(Heap[k].pai == idFilho && Heap[k].id == idPai){
-                        fprintf(ponteiroArquivo, "%d,%d\n", Heap[k].pai , Heap[k].id);
-                        Heap[k].pai = -1;
-                        *custoMst += Heap[k].peso;
-                    }
-                    if(Heap[k].id == idFilho && Heap[k].pai == idPai){
-                        fprintf(ponteiroArquivo, "%d,%d\n", Heap[k].id , Heap[k].pai);
-                        Heap[k].pai = -1;
-                        *custoMst += Heap[k].peso;
-                    }
-                }       
-            }
-        }
-    }
-    fclose(ponteiroArquivo);
-}
-
+/*As duas funcoes de insertionSort sao para a ordenacao da saida. 
+A filho eh feita baseada no id do no e a pai baseada no pai do no*/
 void insertionSortFilho(TipoNo* Heap, int tamanhoHeap){
     int  i, j;
     TipoNo aux;
@@ -115,7 +85,10 @@ void insertionSortPai(TipoNo* Heap, int tamanhoHeap){
 	}
 }
 
-void ImprimeMst2(char* nomeArquivo, TipoNo* Heap, int tamanhoHeap, int* custoMst){
+/*Funcao imprime a MST com arestas ordenadas e calcula seu custo.
+O Newheap eh um array de nos sem o no com o pai igual a -1, que significa a aresta "pai,id" nao pertencer a mst, 
+e com valores de pai certamente maiores que de id*/ 
+void ImprimeMst(char* nomeArquivo, TipoNo* Heap, int tamanhoHeap, int* custoMst){
     FILE* ponteiroArquivo;
     int i;
     TipoNo* newHeap;

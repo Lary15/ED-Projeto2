@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/mst",
-            "args": ["grafo.txt", "saida.txt"],
+            "args": ["Teste/grafo20.txt", "saida.txt"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

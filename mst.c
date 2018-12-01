@@ -15,20 +15,25 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    int IdRetirado, tamanhoHeap, custoGrafoTodo=0, custoMst=0;
+    int IdRetirado, tamanhoHeap, custoGrafoTodo=0, custoMst=0, unica=1;
 
     Apontador n; /* n e Auxn sao variaveis auxiliares utilizadas para percorrer pelas listas de adjacencias*/
-    TipoNo *Auxn;
+    TipoNo* Auxn;
     
-    int *Posicao; /*Vetor que guarda a posicao dos nos no heap baseado no seu id*/
-    TipoNo *Heap; /*Um array que representa um heap*/
-    TipoGrafo *Grafo; 
+    int* Posicao; /*Vetor que guarda a posicao dos nos no heap baseado no seu id, necessario para MudaChave*/
+    TipoNo* Heap; /*Um array que representa um heap*/
+    TipoGrafo* Grafo; 
 
+    /*Criacao do grafo, Heap e vetor Posicao*/
     Grafo = LeGrafo(argv[1], &custoGrafoTodo);
     tamanhoHeap = Grafo->numeroNos;
     Posicao = (int *)malloc(sizeof(int) * tamanhoHeap);
     Heap = CriaHeap(Grafo->numeroNos, Posicao);
 
+    /*Funcao move para posicao zero um no com arestas minimas nao repetidas*/
+    escolheInicio(Heap, Grafo, Posicao);
+
+    /* Algoritmo de Prim*/
     Heap[0].chave = 0;
     while (tamanhoHeap){
         IdRetirado = RetiraMinimo(Heap, &tamanhoHeap, Posicao);
@@ -38,24 +43,38 @@ int main(int argc, char **argv)
 
         while (n != NULL){
             Auxn = n->item;
+            if (Posicao[Auxn->id] < tamanhoHeap && Auxn->peso == Heap[Posicao[Auxn->id]].chave){
+                Heap[Posicao[Auxn->id]].contador_chave++;
+            }
             if (Posicao[Auxn->id] < tamanhoHeap && Auxn->peso < Heap[Posicao[Auxn->id]].chave){
                 Heap[Posicao[Auxn->id]].pai = IdRetirado;
                 Heap[Posicao[Auxn->id]].peso = Auxn->peso;
+                Heap[Posicao[Auxn->id]].contador_chave = 0;
                 MudaChave(Heap, Posicao, Auxn->peso, Auxn->id);
             }
             n = n->proximo;
         }
     }
 
-    // for(int i=0; i<Grafo->numeroNos; i++){
-    //     printf("FILHO: %d, PAI: %d\n", Heap[i].id, Heap[i].pai);
-    // }
-
-    // ImprimeGrafo(Grafo->ListaAdjacencia, Grafo->numeroNos);
-    ImprimeMst2(argv[2], Heap, Grafo->numeroNos, &custoMst);
+    /* Impressao no arquivo texto de saida e calculo do custo da Mst*/
+    ImprimeMst(argv[2], Heap, Grafo->numeroNos, &custoMst);
 
     printf("Mst com custo: %d\n", custoMst);
     printf("Economia em relacao a malha toda conexa: %d\n", (custoGrafoTodo - custoMst));
+
+    /* Verificando contadores de chave a fim de descobrir se a Mst eh unica*/
+    for(int i = 0; i<Grafo->numeroNos; i++){
+        if(Heap[i].contador_chave != 0){
+            unica=0;
+            break;
+        }
+    }
+    if(unica){
+        printf("Mst eh unica\n");
+    }
+    else{
+        printf("Mst nao eh unica\n");
+    }
 
     freeVetorLista(Grafo->ListaAdjacencia, Grafo->numeroNos);
     free(Grafo);
